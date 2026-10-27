@@ -109,7 +109,7 @@ const state = {
   selectedSize: 'L',
   distance: 'squint',
   stripe: { configured: false, mode: 'unconfigured' },
-  stripePaymentLink: '', // Optional Stripe Payment Link (https://buy.stripe.com/...) for static GitHub Pages
+  stripePaymentLink: 'https://buy.stripe.com/test_7sY8wP84q1F07Qw0lMb3q00', // Stripe Payment Link for static GitHub Pages
   dropship: { autoFulfillConfigured: false },
   isLocalAdmin: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
   tamperCount: 0,
@@ -398,8 +398,8 @@ async function handleBuyShirt(simulate = false) {
   const color = getCurrentColor();
   const size = state.selectedSize;
 
-  // If a Stripe Payment Link is configured (for static GitHub Pages hosting), redirect with client_reference_id
-  if (!simulate && state.stripePaymentLink && state.stripePaymentLink.startsWith('https://buy.stripe.com/')) {
+  // On static GitHub Pages (no backend server), redirect straight to the Stripe Payment Link with client_reference_id
+  if (!simulate && !state.stripe.configured && state.stripePaymentLink && state.stripePaymentLink.startsWith('https://buy.stripe.com/')) {
     const refId = `b4t_${phrase.id}_${color.id}_${size}`;
     const sep = state.stripePaymentLink.includes('?') ? '&' : '?';
     window.location.href = `${state.stripePaymentLink}${sep}client_reference_id=${encodeURIComponent(refId)}`;
