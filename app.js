@@ -103,13 +103,13 @@ const state = {
   phrases: FALLBACK_PHRASES,
   colors: FALLBACK_COLORS,
   sizes: FALLBACK_SIZES,
-  priceCents: 2800,
+  priceCents: 1900,
   selectedPhraseIndex: 0,
   selectedColorIndex: 0,
   selectedSize: 'L',
   distance: 'squint',
   stripe: { configured: false, mode: 'unconfigured' },
-  stripePaymentLink: 'https://buy.stripe.com/cNi7sL85s2JD6T7g0J7EQ01', // LIVE Stripe Payment Link for static GitHub Pages
+  stripePaymentLink: 'https://buy.stripe.com/28E8wPdpM5VP1yN9Cl7EQ02', // LIVE $19 Stripe Payment Link for static GitHub Pages
   dropship: { autoFulfillConfigured: false },
   isLocalAdmin: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
   tamperCount: 0,
@@ -963,7 +963,7 @@ function setupTiktokStudio() {
 
     ctx.fillStyle = '#f3f1ea';
     ctx.font = '600 30px "IBM Plex Mono", monospace';
-    ctx.fillText('beefourtees.com · $28', W / 2, H - 198);
+    ctx.fillText('beefourtees.com · $19', W / 2, H - 198);
     ctx.restore();
   }
 
