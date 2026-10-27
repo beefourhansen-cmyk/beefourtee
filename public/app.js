@@ -190,6 +190,7 @@ function buildClientPrintSvgDataUrl(phraseText, hexColor) {
   const escaped = phraseText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4500 5400" width="4500" height="5400">
+  <metadata>Copyright (c) 2026 Bee Four Inc. (Bee Four Tee). All Rights Reserved.</metadata>
   <defs>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500&amp;display=swap');
