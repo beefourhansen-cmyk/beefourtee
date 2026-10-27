@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>bee four tee — a division of bee four inc.</title>
+  <meta name="description" content="All-black heavyweight tees. One line of tiny lowercase neon text. You cannot change the saying. You can change the neon." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <!-- Top Studio Bar -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <a href="./" class="brand-mark">bee four tee</a>
+      <span class="brand-division">a division of bee four inc.</span>
+    </div>
+
+    <div class="topbar-rule" role="note" aria-label="House Rule">
+      <span class="rule-pill">house rule</span>
+      <span class="rule-copy">the words are locked. you pick the neon.</span>
+    </div>
+
+    <div class="topbar-actions">
+      <a href="#archive" class="nav-link">all 70 sayings</a>
+      <button type="button" id="openStripeSetupBtn" class="stripe-status-btn" title="Configure Stripe & Dropshipping">
+        <span class="status-dot" id="stripeStatusDot"></span>
+        <span id="stripeStatusText">stripe setup</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Checkout Notification Banner (shown on return from Stripe) -->
+  <div id="checkoutBanner" class="checkout-banner" hidden>
+    <div class="checkout-banner-inner">
+      <span id="checkoutBannerText"></span>
+      <button type="button" id="closeBannerBtn" class="banner-close" aria-label="Close message">dismiss</button>
+    </div>
+  </div>
+
+  <!-- Main Showroom Stage -->
+  <main class="studio-layout">
+    <!-- Left: Physical Black Tee Preview Stage -->
+    <section class="garment-stage" aria-label="Interactive T-Shirt Preview">
+      <div class="stage-header">
+        <div class="stage-meta">
+          <span class="mono-dim" id="stageSpecimenCode">specimen #01 / 70</span>
+          <span class="mono-dim">100% combed ring-spun jet black cotton</span>
+        </div>
+        <div class="distance-controls" role="group" aria-label="Viewing distance simulator">
+          <span class="distance-label">view from:</span>
+          <button type="button" class="dist-btn" data-distance="far">10 ft</button>
+          <button type="button" class="dist-btn active" data-distance="squint">5 ft (squint)</button>
+          <button type="button" class="dist-btn" data-distance="close">1 ft (loupe)</button>
+        </div>
+      </div>
+
+      <!-- The Black T-Shirt Canvas -->
+      <div class="shirt-viewport" id="shirtViewport" data-distance="squint">
+        <div class="shirt-spotlight"></div>
+
+        <div class="shirt-frame" id="shirtFrame">
+          <!-- Sculptural Heavyweight Black Tee SVG -->
+          <svg class="tshirt-svg" viewBox="0 0 700 780" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <!-- Subtle lighting gradient so jet black #050505 reads as 3D cotton -->
+              <radialGradient id="cottonSheen" cx="50%" cy="32%" r="60%">
+                <stop offset="0%" stop-color="#141414" />
+                <stop offset="55%" stop-color="#070707" />
+                <stop offset="100%" stop-color="#030303" />
+              </radialGradient>
+              <linearGradient id="collarShadow" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#020202" />
+                <stop offset="100%" stop-color="#0d0d0d" />
+              </linearGradient>
+              <filter id="shirtDropShadow" x="-10%" y="-8%" width="120%" height="120%">
+                <feDropShadow dx="0" dy="26" stdDeviation="24" flood-color="#000000" flood-opacity="0.85" />
+              </filter>
+            </defs>
+
+            <!-- Main Heavyweight Boxy Tee Body -->
+            <path
+              filter="url(#shirtDropShadow)"
+              d="M236 52
+                 C268 74, 432 74, 464 52
+                 L558 88
+                 L666 238
+                 L576 306
+                 L514 234
+                 L514 726
+                 C514 734, 508 740, 498 740
+                 L202 740
+                 C192 740, 186 734, 186 726
+                 L186 234
+                 L124 306
+                 L34 238
+                 L142 88
+                 Z"
+              fill="url(#cottonSheen)"
+              stroke="#242422"
+              stroke-width="1.5"
+            />
+
+            <!-- Back Neck Interior + Woven Neck Label -->
+            <path
+              d="M258 56 C290 102, 410 102, 442 56 C410 70, 290 70, 258 56 Z"
+              fill="url(#collarShadow)"
+            />
+            <!-- Tiny woven neck tag inside collar -->
+            <rect x="328" y="65" width="44" height="18" rx="1.5" fill="#171715" stroke="#2c2c28" stroke-width="0.8" />
+            <line x1="335" y1="73" x2="365" y2="73" stroke="var(--active-neon)" stroke-width="1.6" stroke-opacity="0.85" />
+
+            <!-- Thick Ribbed Crewneck Collar -->
+            <path
+              d="M236 52
+                 C276 122, 424 122, 464 52
+                 L443 56
+                 C410 102, 290 102, 257 56
+                 Z"
+              fill="#0a0a0a"
+              stroke="#222220"
+              stroke-width="1.2"
+            />
+
+            <!-- Subtle Sleeve Seams & Hem Stitching -->
+            <path d="M142 88 C168 142, 182 188, 186 234" stroke="#181817" stroke-width="1.2" stroke-dasharray="3 2" />
+            <path d="M558 88 C532 142, 518 188, 514 234" stroke="#181817" stroke-width="1.2" stroke-dasharray="3 2" />
+            <line x1="188" y1="720" x2="512" y2="720" stroke="#181817" stroke-width="1.2" stroke-dasharray="3 3" />
+          </svg>
+
+          <!-- The Screenprinted Single-Line Chest Phrase -->
+          <div class="chest-print-zone" id="chestPrintZone" title="Click to test the House Rule">
+            <span class="chest-phrase" id="shirtChestText">planned ragamuffin</span>
+          </div>
+        </div>
+
+        <div class="stage-caption">
+          <p id="distanceCaption">
+            at 5 feet: small enough to force a squint. bright enough that they know something is written on your chest.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Tactile Garment Spec & Order Ticket -->
+    <aside class="garment-ticket" aria-label="Configure and Purchase Shirt">
+      <div class="ticket-inner">
+        <div class="ticket-header">
+          <div class="ticket-id-block">
+            <span class="ticket-tag">bee four tee / archive issue</span>
+            <h1 class="ticket-title" id="ticketSpecimenId">specimen #01</h1>
+          </div>
+          <div class="ticket-price" id="ticketPriceDisplay">$28</div>
+        </div>
+
+        <!-- Generator / Shuffle Control -->
+        <div class="generator-block">
+          <div class="phrase-display-box" id="phraseDisplayBox" role="button" tabindex="0" aria-label="Current phrase (locked)">
+            <div class="phrase-box-top">
+              <span class="lock-badge">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                saying locked — no custom text
+              </span>
+              <span class="lowercase-spec">lowercase · zero punctuation</span>
+            </div>
+
+            <div class="phrase-readout" id="ticketPhraseText">planned ragamuffin</div>
+
+            <div class="tamper-notice" id="tamperNotice" hidden>
+              you can’t edit the words. every phrase was collected in the wild. deal another or change the neon.
+            </div>
+          </div>
+
+          <button type="button" class="deal-btn" id="dealShirtBtn">
+            <span class="deal-btn-main">generate a shirt for me</span>
+            <span class="deal-btn-sub">spins 1 of 70 collected phrases [space]</span>
+          </button>
+        </div>
+
+        <!-- Step 1: Choose Neon Ink (Allowed!) -->
+        <div class="control-group">
+          <div class="control-header">
+            <span class="control-label">choose neon ink <em class="allowed-tag">you pick this</em></span>
+            <span class="control-value" id="selectedColorName">neon yellow · 809 C</span>
+          </div>
+          <div class="swatch-grid" id="colorSwatchGrid" role="radiogroup" aria-label="Neon ink color">
+            <!-- Populated by app.js -->
+          </div>
+        </div>
+
+        <!-- Step 2: Choose Black Tee Size -->
+        <div class="control-group">
+          <div class="control-header">
+            <span class="control-label">garment size <em class="allowed-tag">all-black tee only</em></span>
+            <span class="control-value" id="selectedSizeLabel">size L · relaxed unisex fit</span>
+          </div>
+          <div class="size-grid" id="sizeGrid" role="radiogroup" aria-label="T-Shirt size">
+            <!-- Populated by app.js -->
+          </div>
+        </div>
+
+        <!-- Fixed Specs Summary -->
+        <dl class="spec-list">
+          <div class="spec-row">
+            <dt>garment blank</dt>
+            <dd>pitch black (#050505) only — never white, never grey</dd>
+          </div>
+          <div class="spec-row">
+            <dt>chest typography</dt>
+            <dd>single line · 0.28" cap height · squint grade</dd>
+          </div>
+          <div class="spec-row">
+            <dt>fulfillment</dt>
+            <dd>direct-to-garment dropship · ships worldwide</dd>
+          </div>
+        </dl>
+
+        <!-- Primary Stripe Checkout CTA -->
+        <div class="checkout-actions">
+          <button type="button" class="buy-btn" id="buyShirtBtn">
+            <span id="buyBtnLabel">buy this shirt — $28</span>
+          </button>
+          <div class="checkout-subactions">
+            <span class="secure-note">instant checkout via Stripe · free dropship delivery</span>
+            <a href="#" id="downloadPrintSvgLink" class="print-file-link" title="Download 300 DPI transparent DTG vector print file">
+              export print svg
+            </a>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Full 70-Phrase Archive Section -->
+  <section class="archive-section" id="archive">
+    <div class="archive-header">
+      <div>
+        <h2 class="archive-title">the 70 collected phrases</h2>
+        <p class="archive-subtitle">
+          collected over years. click any specimen below to load it onto the black tee above. you still can’t change a single letter.
+        </p>
+      </div>
+
+      <div class="archive-controls">
+        <input
+          type="search"
+          id="archiveSearchInput"
+          class="archive-search"
+          placeholder="filter the 70 sayings..."
+          aria-label="Filter phrases"
+        />
+      </div>
+    </div>
+
+    <div class="archive-grid" id="archiveGrid">
+      <!-- Populated by app.js -->
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-left">
+      <strong>bee four tee</strong> — a division of <strong>Bee Four Inc.</strong>
+      <span>all shirts are black. all letters are lowercase. no punctuation survives.</span>
+    </div>
+    <div class="footer-right">
+      <button type="button" class="footer-link-btn" id="footerSetupBtn">owner / stripe &amp; dropship setup</button>
+    </div>
+  </footer>
+
+  <!-- Owner Stripe + Dropshipping Setup Modal -->
+  <div class="modal-backdrop" id="setupModal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="setupModalTitle">
+      <div class="modal-header">
+        <div>
+          <span class="modal-eyebrow">bee four inc. — merchant console</span>
+          <h2 id="setupModalTitle" class="modal-title">accept payments &amp; dropship tonight</h2>
+        </div>
+        <button type="button" class="modal-close" id="closeSetupModalBtn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <form id="stripeConfigForm" class="modal-body">
+        <p class="modal-intro">
+          plug in your Stripe secret key from <a href="https://dashboard.stripe.com/apikeys" target="_blank" rel="noopener">dashboard.stripe.com/apikeys</a>.
+          every order automatically captures the customer’s shipping address, exact specimen phrase, neon Pantone color, size, and attaches the print-ready DTG vector file.
+        </p>
+
+        <div id="modalPreviewOrderBox" class="preview-order-box" hidden>
+          <div class="preview-order-title">ready to check out right now:</div>
+          <div id="modalPreviewOrderDetails" class="preview-order-details"></div>
+          <button type="button" id="simulateOrderBtn" class="btn-primary" style="margin-top:0.65rem;width:100%;">
+            run instant test checkout (no stripe key needed)
+          </button>
+        </div>
+
+        <label class="form-field">
+          <span class="field-label">Stripe Secret Key (<code>sk_live_...</code> or <code>sk_test_...</code>)</span>
+          <input
+            type="password"
+            id="stripeSecretKeyInput"
+            class="field-input"
+            placeholder="sk_live_..."
+            autocomplete="off"
+          />
+          <span class="field-hint" id="currentStripeKeyStatus">currently unconfigured — paste your key to turn on live checkout</span>
+        </label>
+
+        <div class="form-row">
+          <label class="form-field">
+            <span class="field-label">shirt price (USD)</span>
+            <input
+              type="number"
+              id="shirtPriceInput"
+              class="field-input"
+              min="5"
+              max="500"
+              step="1"
+              value="28"
+            />
+          </label>
+
+          <label class="form-field">
+            <span class="field-label">Printful API Key (optional auto-dropship)</span>
+            <input
+              type="password"
+              id="printfulApiKeyInput"
+              class="field-input"
+              placeholder="optional — auto-creates black 3001 tee order"
+              autocomplete="off"
+            />
+          </label>
+        </div>
+
+        <div class="webhook-info">
+          <strong>how dropshipping works with zero monthly fees:</strong>
+          <ol>
+            <li>Stripe Checkout collects payment + shipping address and stores the exact phrase, neon hex, size, and print SVG link in the payment metadata.</li>
+            <li>Download any shirt’s 300 DPI transparent chest print SVG using <strong>export print svg</strong>, or connect a Printful API key + Stripe webhook (<code>/api/webhooks/stripe</code>) for 100% hands-free fulfillment on a jet-black Bella+Canvas 3001 tee.</li>
+          </ol>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelSetupBtn">close</button>
+          <button type="submit" class="btn-primary" id="saveSetupBtn">save &amp; activate stripe</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

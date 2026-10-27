@@ -1,0 +1,13 @@
+{
+  "name": "bee-four-tee",
+  "version": "1.0.0",
+  "description": "Bee Four Tee — A division of Bee Four Inc. All-black tees, tiny lowercase neon phrases. You pick the neon, never the words.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
