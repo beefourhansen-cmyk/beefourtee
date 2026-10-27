@@ -249,8 +249,8 @@ function getDropshipInfo() {
 }
 
 function getPriceCents() {
-  const parsed = parseInt(process.env.SHIRT_PRICE_CENTS || '2800', 10);
-  return Number.isFinite(parsed) && parsed >= 500 ? parsed : 2800;
+  const parsed = parseInt(process.env.SHIRT_PRICE_CENTS || '1900', 10);
+  return Number.isFinite(parsed) && parsed >= 500 ? parsed : 1900;
 }
 
 // Generate 4500x5400 DTG transparent SVG print file for chest placement
