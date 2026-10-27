@@ -281,19 +281,7 @@ input {
   justify-content: center;
   padding: 2.25rem 1.5rem 3.25rem;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 50% 44%, #272723 0%, #181816 58%, #121210 100%);
-}
-
-.shirt-spotlight {
-  position: absolute;
-  width: 480px;
-  height: 480px;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--active-neon-glow) 0%, transparent 70%);
-  opacity: 0.14;
-  pointer-events: none;
-  transition: background 0.25s ease;
+  background: #191917;
 }
 
 .shirt-frame {
