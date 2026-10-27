@@ -53,6 +53,83 @@ function normalizePhrase(raw) {
     .trim();
 }
 
+const DEFAULT_ARCHIVE_PHRASES = [
+  'planned ragamuffin',
+  'hot chicken beak',
+  'boob bones',
+  'flake cereal girl',
+  'sharts discreetly',
+  'theres always the bathtub',
+  'prolapsed prostate',
+  'english muffin dough',
+  'hot skunt',
+  'brain swab',
+  'shredded latex',
+  'pterodactyl tits',
+  'fuzzy balloon knot',
+  'juicy deets',
+  'schmear gobbler',
+  'finger them all then flip them the bird',
+  'parallelograms can kiss my rectogon',
+  'turtle rehab',
+  'the bite slaps',
+  'gluten free guilt',
+  'houndstooth hallmark',
+  'nipple schmear',
+  'pelican gizzard',
+  'stunned mullet',
+  'butthole infection',
+  'sex toy storage',
+  'thats not grandma thats drugs',
+  'cooter cougher',
+  'i live under the bus',
+  'sand repellent anus',
+  'manpons',
+  'jew yew',
+  'foreskin schmoreskin',
+  'baste my turkey',
+  'fiveskin',
+  'goldilocks cockle',
+  'trashy telly',
+  'ballet hype boy',
+  'i did not start a cult',
+  'sous vide panties',
+  'party awroka',
+  'party tit',
+  'mount mammary',
+  'of sorts',
+  'im a hobo 10',
+  'all nilly no willy',
+  'vegetarian with loose morals',
+  'steamed pants clam',
+  'dont be hasty just be tasty',
+  'ticklish fancy',
+  'vagitarian',
+  'free range titties',
+  'chickens tits',
+  'doodle xray',
+  'one persons trash is anothers dildo',
+  'black face nuts',
+  'esquiffe',
+  'brazil nut',
+  'blonde python',
+  'slutty squirrel',
+  'mamma nuts first',
+  'fussy bussy',
+  'my tits are islands',
+  'your own business',
+  'ramen rack activated',
+  'wet gizzard',
+  'sea gull',
+  'shop lifted anal beads',
+  'dings and diddles',
+  'spiritual lesbian'
+].map((text, idx) => ({
+  id: String(idx + 1).padStart(2, '0'),
+  raw: text,
+  text
+}));
+
 function loadPhrasesFromReadme() {
   const readmePath = path.join(__dirname, 'readme.txt');
   const rawLines = fs.existsSync(readmePath)
@@ -79,7 +156,7 @@ function loadPhrasesFromReadme() {
       });
     }
   }
-  return phrases;
+  return phrases.length > 0 ? phrases : DEFAULT_ARCHIVE_PHRASES;
 }
 
 const NEON_COLORS = [
@@ -244,28 +321,19 @@ async function createStripeCheckoutSession({ phrase, color, size, origin }) {
   }
 
   const priceCents = getPriceCents();
-  const printFileUrl = `${origin}/api/print-file.svg?phrase=${encodeURIComponent(phrase.text)}&color=${encodeURIComponent(color.id)}`;
 
   const params = new URLSearchParams();
+  params.append('ui_mode', 'hosted_page');
   params.append('mode', 'payment');
+  params.append('billing_address_collection', 'auto');
+  params.append('phone_number_collection[enabled]', 'false');
+  params.append('automatic_tax[enabled]', 'false');
+  params.append('allow_promotion_codes', 'true');
+  params.append('submit_type', 'auto');
+  params.append('integration_identifier', 'hosted_mobile_app_0001');
+  params.append('origin_context', 'mobile_app');
   params.append('success_url', `${origin}/?checkout=success&phrase=${encodeURIComponent(phrase.id)}&color=${encodeURIComponent(color.id)}&size=${encodeURIComponent(size)}&session_id={CHECKOUT_SESSION_ID}`);
   params.append('cancel_url', `${origin}/?checkout=cancelled&phrase=${encodeURIComponent(phrase.id)}&color=${encodeURIComponent(color.id)}&size=${encodeURIComponent(size)}`);
-
-  // Collect shipping address for dropshipping fulfillment (Canada & US first)
-  const allowedCountries = ['CA', 'US', 'GB', 'AU', 'NZ', 'IE', 'DE', 'FR', 'NL', 'SE', 'NO', 'DK'];
-  allowedCountries.forEach((country, idx) => {
-    params.append(`shipping_address_collection[allowed_countries][${idx}]`, country);
-  });
-
-  // Free shipping or flat rate option
-  params.append('shipping_options[0][shipping_rate_data][type]', 'fixed_amount');
-  params.append('shipping_options[0][shipping_rate_data][fixed_amount][amount]', '0');
-  params.append('shipping_options[0][shipping_rate_data][fixed_amount][currency]', 'usd');
-  params.append('shipping_options[0][shipping_rate_data][display_name]', 'Standard Dropship Delivery (Included)');
-  params.append('shipping_options[0][shipping_rate_data][delivery_estimate][minimum][unit]', 'business_day');
-  params.append('shipping_options[0][shipping_rate_data][delivery_estimate][minimum][value]', '4');
-  params.append('shipping_options[0][shipping_rate_data][delivery_estimate][maximum][unit]', 'business_day');
-  params.append('shipping_options[0][shipping_rate_data][delivery_estimate][maximum][value]', '8');
 
   // Line item
   params.append('line_items[0][quantity]', '1');
@@ -276,26 +344,6 @@ async function createStripeCheckoutSession({ phrase, color, size, origin }) {
     'line_items[0][price_data][product_data][description]',
     `All-black tee · ${color.label} (${color.name}) ink · Size ${size} · Single-line lowercase squint print · Bee Four Inc.`
   );
-
-  // Order metadata for dropship fulfillment & dashboard visibility
-  const metadata = {
-    brand: 'Bee Four Tee (Bee Four Inc)',
-    specimen_id: phrase.id,
-    phrase_printed: phrase.text,
-    garment_color: 'Jet Black (#050505)',
-    neon_color_id: color.id,
-    neon_color_name: color.name,
-    neon_hex: color.hex,
-    neon_pantone: color.pantone,
-    garment_size: size,
-    printful_variant_id: String(PRINTFUL_BLACK_3001_VARIANTS[size] || 4018),
-    print_file_svg: printFileUrl
-  };
-
-  for (const [k, v] of Object.entries(metadata)) {
-    params.append(`metadata[${k}]`, v);
-    params.append(`payment_intent_data[metadata][${k}]`, v);
-  }
 
   const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
     method: 'POST',
