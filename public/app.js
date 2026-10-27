@@ -109,7 +109,7 @@ const state = {
   selectedSize: 'L',
   distance: 'squint',
   stripe: { configured: false, mode: 'unconfigured' },
-  stripePaymentLink: 'https://buy.stripe.com/test_7sY8wP84q1F07Qw0lMb3q00', // Stripe Payment Link for static GitHub Pages
+  stripePaymentLink: 'https://buy.stripe.com/cNi7sL85s2JD6T7g0J7EQ01', // LIVE Stripe Payment Link for static GitHub Pages
   dropship: { autoFulfillConfigured: false },
   isLocalAdmin: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
   tamperCount: 0,
