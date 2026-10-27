@@ -146,14 +146,18 @@ const PRINTFUL_BLACK_3001_VARIANTS = {
   '3XL': 5295
 };
 
+function isValidStripeKey(key) {
+  return Boolean(key && (key.startsWith('sk_') || key.startsWith('rk_')));
+}
+
 function getStripeInfo() {
   const key = process.env.STRIPE_SECRET_KEY || '';
-  if (!key || !key.startsWith('sk_')) {
+  if (!isValidStripeKey(key)) {
     return { configured: false, mode: 'unconfigured' };
   }
   return {
     configured: true,
-    mode: key.startsWith('sk_live_') ? 'live' : 'test',
+    mode: key.includes('_live_') ? 'live' : 'test',
     maskedKey: key.slice(0, 8) + '••••••••' + key.slice(-4)
   };
 }
@@ -233,7 +237,7 @@ function sendJson(res, status, payload) {
 
 async function createStripeCheckoutSession({ phrase, color, size, origin }) {
   const stripeKey = process.env.STRIPE_SECRET_KEY;
-  if (!stripeKey || !stripeKey.startsWith('sk_')) {
+  if (!isValidStripeKey(stripeKey)) {
     const err = new Error('STRIPE_NOT_CONFIGURED');
     err.code = 'STRIPE_NOT_CONFIGURED';
     throw err;
@@ -381,9 +385,9 @@ const server = http.createServer(async (req, res) => {
 
       if (typeof body.stripeSecretKey === 'string') {
         const key = body.stripeSecretKey.trim();
-        if (key && !key.startsWith('sk_')) {
+        if (key && !isValidStripeKey(key)) {
           return sendJson(res, 400, {
-            error: 'Stripe Secret Key must start with sk_live_ or sk_test_.'
+            error: 'Stripe Secret Key must start with sk_ or rk_.'
           });
         }
         updates.STRIPE_SECRET_KEY = key;
