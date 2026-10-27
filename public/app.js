@@ -382,6 +382,14 @@ function spinRandomShirt() {
       state.selectedPhraseIndex = targetIndex;
       state.isSpinning = false;
       renderShirtAndTicket();
+      const chosen = getCurrentPhrase();
+      trackTikTokEvent('ViewContent', {
+        content_type: 'product',
+        content_id: `b4t_${chosen.id}`,
+        content_name: chosen.text,
+        currency: 'USD',
+        value: state.priceCents / 100
+      });
     }
   }, 42);
 }
@@ -397,6 +405,14 @@ async function handleBuyShirt(simulate = false) {
   const phrase = getCurrentPhrase();
   const color = getCurrentColor();
   const size = state.selectedSize;
+
+  trackTikTokEvent('InitiateCheckout', {
+    content_type: 'product',
+    content_id: `b4t_${phrase.id}_${color.id}_${size}`,
+    content_name: `bee four tee #${phrase.id}: ${phrase.text} (${color.name})`,
+    currency: 'USD',
+    value: state.priceCents / 100
+  });
 
   // On static GitHub Pages (no backend server), redirect straight to the Stripe Payment Link with client_reference_id
   if (!simulate && !state.stripe.configured && state.stripePaymentLink && state.stripePaymentLink.startsWith('https://buy.stripe.com/')) {
@@ -746,4 +762,309 @@ function startSalesTicker() {
   nextTimer = setTimeout(scheduleNext, 2200);
 }
 
+// --- TikTok Pixel & Events Integration ---
+function loadTikTokPixel(pixelId) {
+  if (!pixelId || window.ttq) return;
+  !(function (w, d, t) {
+    w.TiktokAnalyticsObject = t;
+    var ttq = (w[t] = w[t] || []);
+    ttq.methods = ['page', 'track', 'identify', 'instances', 'debug', 'on', 'off', 'once', 'ready', 'alias', 'group', 'enableCookie', 'disableCookie'];
+    ttq.setAndDefer = function (t, e) {
+      t[e] = function () {
+        t.push([e].concat(Array.prototype.slice.call(arguments, 0)));
+      };
+    };
+    for (var i = 0; i < ttq.methods.length; i++) ttq.setAndDefer(ttq, ttq.methods[i]);
+    ttq.load = function (e) {
+      var n = 'https://analytics.tiktok.com/i18n/pixel/events.js';
+      var a = d.createElement('script');
+      a.type = 'text/javascript';
+      a.async = true;
+      a.src = n + '?sdkid=' + e + '&lib=' + t;
+      var s = d.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(a, s);
+    };
+    ttq.load(pixelId);
+    ttq.page();
+  })(window, document, 'ttq');
+}
+
+function trackTikTokEvent(eventName, props) {
+  if (window.ttq && typeof window.ttq.track === 'function') {
+    window.ttq.track(eventName, props);
+  }
+}
+
+// --- Built-In 9:16 Vertical TikTok Video Generator (1080x1920) ---
+function setupTiktokStudio() {
+  const openBtn = document.getElementById('openTiktokStudioBtn');
+  const modal = document.getElementById('tiktokStudioModal');
+  const closeBtn = document.getElementById('closeTiktokStudioBtn');
+  const canvas = document.getElementById('tiktokCanvas');
+  const hookInput = document.getElementById('tiktokHookInput');
+  const pixelInput = document.getElementById('tiktokPixelIdInput');
+  const replayBtn = document.getElementById('replayTiktokPreviewBtn');
+  const recordBtn = document.getElementById('recordTiktokVideoBtn');
+  const statusEl = document.getElementById('tiktokRecordStatus');
+
+  if (!openBtn || !modal || !canvas) return;
+  const ctx = canvas.getContext('2d');
+  const shirtPath = new Path2D(
+    'M236 52 C268 74, 432 74, 464 52 L558 88 L666 238 L576 306 L514 234 L514 726 C514 734, 508 740, 498 740 L202 740 C192 740, 186 734, 186 726 L186 234 L124 306 L34 238 L142 88 Z'
+  );
+  const collarPath = new Path2D(
+    'M236 52 C276 122, 424 122, 464 52 L443 56 C410 102, 290 102, 257 56 Z'
+  );
+
+  let animFrame = null;
+  let startTime = 0;
+  let rapidSequence = [];
+  const DURATION_MS = 8500;
+
+  function buildRapidSequence() {
+    const current = getCurrentPhrase();
+    const curColor = getCurrentColor();
+    const mustHave = [
+      current.text,
+      'planned ragamuffin',
+      'doodle xray',
+      'sharts discreetly',
+      'pterodactyl tits',
+      'thats not grandma thats drugs',
+      'spiritual lesbian',
+      'free range titties',
+      'i did not start a cult',
+      'gluten free guilt'
+    ];
+    rapidSequence = mustHave.map((text, idx) => ({
+      text,
+      color: idx === 0 ? curColor : state.colors[(state.selectedColorIndex + idx) % state.colors.length]
+    }));
+  }
+
+  function easeInOutCubic(x) {
+    return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  }
+
+  function drawFrame(elapsedMs) {
+    const t = (elapsedMs % DURATION_MS) / 1000; // 0 to 8.5s
+    const W = 1080;
+    const H = 1920;
+
+    // 1. Studio dark background
+    ctx.fillStyle = '#151513';
+    ctx.fillRect(0, 0, W, H);
+
+    // Determine phase:
+    // 0.0 - 1.8s: 10 ft far shot ("wait... what does their shirt say?")
+    // 1.8 - 3.5s: Zoom into squint zone on primary phrase
+    // 3.5 - 6.8s: Rapid-fire neon flashes (10 phrases @ 0.33s each)
+    // 6.8 - 8.5s: Outro / beefourtees.com CTA
+    let scale = 0.9;
+    let activeText = rapidSequence[0]?.text || 'planned ragamuffin';
+    let activeColor = rapidSequence[0]?.color || state.colors[0];
+    let distanceTag = '10 ft · across the room';
+
+    if (t < 1.8) {
+      scale = 0.72;
+      distanceTag = 'view from: 10 ft';
+    } else if (t < 3.5) {
+      const p = easeInOutCubic((t - 1.8) / 1.1);
+      scale = 0.72 + p * 1.48; // zooms to 2.2x chest loupe
+      distanceTag = 'view from: 5 ft (squint zone)';
+    } else if (t < 6.8) {
+      const idx = Math.min(rapidSequence.length - 1, Math.floor((t - 3.5) / 0.33));
+      activeText = rapidSequence[idx].text;
+      activeColor = rapidSequence[idx].color;
+      scale = idx % 2 === 0 ? 2.25 : 1.95;
+      distanceTag = `specimen archive · ${activeColor.name}`;
+    } else {
+      const p = easeInOutCubic(Math.min(1, (t - 6.8) / 0.5));
+      scale = 2.25 - p * 1.15; // pulls back to 1.1x
+      activeText = rapidSequence[0].text;
+      activeColor = rapidSequence[0].color;
+      distanceTag = 'all 70 sayings · beefourtees.com';
+    }
+
+    // 2. Draw Black Heavyweight T-Shirt centered around chest point (350, 230 in 700x780 SVG space)
+    ctx.save();
+    ctx.translate(W / 2, H * 0.49);
+    ctx.scale(scale, scale);
+    ctx.translate(-350, -230);
+
+    ctx.fillStyle = '#060606';
+    ctx.strokeStyle = '#262623';
+    ctx.lineWidth = 2;
+    ctx.fill(shirtPath);
+    ctx.stroke(shirtPath);
+
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fill(collarPath);
+    ctx.stroke(collarPath);
+
+    // Woven neck tag neon line
+    ctx.fillStyle = '#171715';
+    ctx.fillRect(328, 65, 44, 18);
+    ctx.strokeStyle = activeColor.hex;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(335, 74);
+    ctx.lineTo(365, 74);
+    ctx.stroke();
+
+    // Chest phrase on shirt (at 350, 230)
+    ctx.fillStyle = activeColor.hex;
+    ctx.shadowColor = activeColor.hex;
+    ctx.shadowBlur = 10;
+    const fSize = activeText.length > 28 ? 11.5 : 13.5;
+    ctx.font = `600 ${fSize}px "Space Grotesk", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(activeText, 350, 230);
+    ctx.restore();
+
+    // 3. Top Hook Banner (0 - 3.5s) or Archive Header (3.5 - 8.5s)
+    ctx.save();
+    ctx.textAlign = 'center';
+    if (t < 3.5) {
+      const hookStr = (hookInput.value || 'wait... what does their shirt say?').toLowerCase();
+      ctx.fillStyle = '#060606';
+      ctx.strokeStyle = activeColor.hex;
+      ctx.lineWidth = 3;
+      ctx.fillRect(90, 170, W - 180, 128);
+      ctx.strokeRect(90, 170, W - 180, 128);
+
+      ctx.fillStyle = '#f3f1ea';
+      ctx.font = '700 44px "Space Grotesk", sans-serif';
+      ctx.fillText(hookStr, W / 2, 248);
+    } else {
+      ctx.fillStyle = activeColor.hex;
+      ctx.font = '700 54px "Space Grotesk", sans-serif';
+      ctx.fillText('bee four tee', W / 2, 210);
+      ctx.fillStyle = '#a3a196';
+      ctx.font = '500 28px "IBM Plex Mono", monospace';
+      ctx.fillText('the words are locked. you pick the neon.', W / 2, 266);
+    }
+
+    // 4. Bottom HUD / CTA Card
+    ctx.fillStyle = '#060606';
+    ctx.fillRect(80, H - 390, W - 160, 230);
+    ctx.strokeStyle = activeColor.hex;
+    ctx.lineWidth = 4;
+    ctx.strokeRect(80, H - 390, W - 160, 230);
+
+    ctx.fillStyle = '#9a988e';
+    ctx.font = '500 26px "IBM Plex Mono", monospace';
+    ctx.fillText(distanceTag, W / 2, H - 330);
+
+    ctx.fillStyle = activeColor.hex;
+    ctx.font = '700 46px "Space Grotesk", sans-serif';
+    ctx.fillText(`"${activeText}"`, W / 2, H - 262);
+
+    ctx.fillStyle = '#f3f1ea';
+    ctx.font = '600 30px "IBM Plex Mono", monospace';
+    ctx.fillText('beefourtees.com · $28', W / 2, H - 198);
+    ctx.restore();
+  }
+
+  function loop(now) {
+    if (modal.hidden) return;
+    if (!startTime) startTime = now;
+    drawFrame(now - startTime);
+    animFrame = requestAnimationFrame(loop);
+  }
+
+  function startPreview() {
+    buildRapidSequence();
+    startTime = performance.now();
+    cancelAnimationFrame(animFrame);
+    animFrame = requestAnimationFrame(loop);
+  }
+
+  openBtn.addEventListener('click', () => {
+    modal.hidden = false;
+    const savedPixel = localStorage.getItem('b4t_tiktok_pixel') || '';
+    if (savedPixel && !pixelInput.value) pixelInput.value = savedPixel;
+    startPreview();
+  });
+
+  function closeStudio() {
+    modal.hidden = true;
+    cancelAnimationFrame(animFrame);
+  }
+
+  closeBtn.addEventListener('click', closeStudio);
+  modal.addEventListener('click', e => {
+    if (e.target === modal) closeStudio();
+  });
+
+  replayBtn.addEventListener('click', () => {
+    if (pixelInput.value.trim()) {
+      localStorage.setItem('b4t_tiktok_pixel', pixelInput.value.trim());
+      loadTikTokPixel(pixelInput.value.trim());
+    }
+    startPreview();
+  });
+
+  recordBtn.addEventListener('click', () => {
+    if (typeof MediaRecorder === 'undefined' || !canvas.captureStream) {
+      statusEl.textContent = 'Your browser does not support Canvas video recording. Try Chrome or Edge.';
+      return;
+    }
+
+    recordBtn.disabled = true;
+    recordBtn.textContent = 'recording 9:16 video (8.5s)...';
+    statusEl.textContent = 'recording 1080×1920 @ 60fps — keep this window open for 8.5 seconds...';
+
+    buildRapidSequence();
+    startTime = performance.now();
+    cancelAnimationFrame(animFrame);
+    animFrame = requestAnimationFrame(loop);
+
+    const stream = canvas.captureStream(60);
+    const mimeTypes = [
+      'video/mp4;codecs=avc1',
+      'video/webm;codecs=vp9',
+      'video/webm;codecs=vp8',
+      'video/webm'
+    ];
+    const supportedMime = mimeTypes.find(m => MediaRecorder.isTypeSupported(m)) || '';
+    const recorder = supportedMime
+      ? new MediaRecorder(stream, { mimeType: supportedMime, videoBitsPerSecond: 8000000 })
+      : new MediaRecorder(stream);
+
+    const chunks = [];
+    recorder.ondataavailable = e => {
+      if (e.data && e.data.size > 0) chunks.push(e.data);
+    };
+
+    recorder.onstop = () => {
+      const ext = supportedMime.includes('mp4') ? 'mp4' : 'webm';
+      const blob = new Blob(chunks, { type: supportedMime || 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const slug = getCurrentPhrase().text.replace(/\s+/g, '-').slice(0, 24);
+      a.href = url;
+      a.download = `beefourtees-tiktok-9x16-${slug}.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      recordBtn.disabled = false;
+      recordBtn.textContent = 'record & download 9:16 video (8.5s)';
+      statusEl.textContent = `✓ downloaded beefourtees-tiktok-9x16-${slug}.${ext} (1080×1920)!`;
+    };
+
+    recorder.start();
+    setTimeout(() => {
+      if (recorder.state === 'recording') recorder.stop();
+    }, DURATION_MS);
+  });
+
+  // Auto-load saved TikTok Pixel if present
+  const existingPixel = localStorage.getItem('b4t_tiktok_pixel');
+  if (existingPixel) loadTikTokPixel(existingPixel);
+}
+
+setupTiktokStudio();
 init();

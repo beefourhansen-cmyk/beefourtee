@@ -261,6 +261,7 @@
       <span>all shirts are black. all letters are lowercase. no punctuation survives.</span>
     </div>
     <div class="footer-right">
+      <button type="button" class="footer-link-btn" id="openTiktokStudioBtn">tiktok 9:16 video generator</button>
       <button type="button" class="footer-link-btn" id="footerSetupBtn">owner / stripe &amp; dropship setup</button>
     </div>
   </footer>
@@ -341,6 +342,64 @@
           <button type="submit" class="btn-primary" id="saveSetupBtn">save &amp; activate stripe</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Built-In 9:16 Vertical TikTok Video Generator Modal -->
+  <div class="modal-backdrop" id="tiktokStudioModal" hidden>
+    <div class="modal-card tiktok-modal-card" role="dialog" aria-modal="true" aria-labelledby="tiktokStudioTitle">
+      <div class="modal-header">
+        <div>
+          <span class="modal-eyebrow">bee four tee — 1080×1920 vertical ad studio</span>
+          <h2 id="tiktokStudioTitle" class="modal-title">9:16 TikTok &amp; Reels Video Generator</h2>
+        </div>
+        <button type="button" class="modal-close" id="closeTiktokStudioBtn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="tiktok-studio-body">
+        <div class="tiktok-canvas-wrap">
+          <canvas id="tiktokCanvas" width="1080" height="1920"></canvas>
+        </div>
+
+        <div class="tiktok-controls-col">
+          <p class="modal-intro">
+            Generates a crisp <strong>1080×1920 (9:16)</strong> vertical video starting at 10 ft (<em>"wait… what does their shirt say?"</em>), zooming into the squint zone on your current shirt, and flashing rapid-fire through the archive in glowing neon.
+          </p>
+
+          <label class="form-field">
+            <span class="field-label">Opening Hook Text</span>
+            <input
+              type="text"
+              id="tiktokHookInput"
+              class="field-input"
+              value="wait... what does their shirt say?"
+            />
+          </label>
+
+          <label class="form-field">
+            <span class="field-label">TikTok Pixel ID (optional — auto-fires ViewContent &amp; InitiateCheckout)</span>
+            <input
+              type="text"
+              id="tiktokPixelIdInput"
+              class="field-input"
+              placeholder="e.g. C1234567890ABCDEF"
+            />
+          </label>
+
+          <div class="tiktok-btn-stack">
+            <button type="button" class="btn-secondary" id="replayTiktokPreviewBtn">
+              replay preview + shuffle rapid-fire phrases
+            </button>
+            <button type="button" class="btn-primary" id="recordTiktokVideoBtn">
+              record &amp; download 9:16 video (8.5s)
+            </button>
+          </div>
+
+          <div class="field-hint" id="tiktokRecordStatus">
+            ready — click "record &amp; download 9:16 video" to export a 60fps vertical video for TikTok / Reels.
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
