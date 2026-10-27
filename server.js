@@ -247,8 +247,8 @@ async function createStripeCheckoutSession({ phrase, color, size, origin }) {
   params.append('success_url', `${origin}/?checkout=success&phrase=${encodeURIComponent(phrase.id)}&color=${encodeURIComponent(color.id)}&size=${encodeURIComponent(size)}&session_id={CHECKOUT_SESSION_ID}`);
   params.append('cancel_url', `${origin}/?checkout=cancelled&phrase=${encodeURIComponent(phrase.id)}&color=${encodeURIComponent(color.id)}&size=${encodeURIComponent(size)}`);
 
-  // Collect shipping address for dropshipping fulfillment
-  const allowedCountries = ['US', 'CA', 'GB', 'AU', 'NZ', 'IE', 'DE', 'FR', 'NL', 'SE', 'NO', 'DK'];
+  // Collect shipping address for dropshipping fulfillment (Canada & US first)
+  const allowedCountries = ['CA', 'US', 'GB', 'AU', 'NZ', 'IE', 'DE', 'FR', 'NL', 'SE', 'NO', 'DK'];
   allowedCountries.forEach((country, idx) => {
     params.append(`shipping_address_collection[allowed_countries][${idx}]`, country);
   });
