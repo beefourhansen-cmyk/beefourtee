@@ -883,7 +883,7 @@ function setupTiktokStudio() {
       scale = 2.25 - p * 1.15; // pulls back to 1.1x
       activeText = rapidSequence[0].text;
       activeColor = rapidSequence[0].color;
-      distanceTag = 'all 70 sayings · beefourtees.com';
+      distanceTag = 'all 70 sayings · beefourtees.shop';
     }
 
     // 2. Draw Black Heavyweight T-Shirt centered around chest point (350, 230 in 700x780 SVG space)
@@ -963,7 +963,7 @@ function setupTiktokStudio() {
 
     ctx.fillStyle = '#f3f1ea';
     ctx.font = '600 30px "IBM Plex Mono", monospace';
-    ctx.fillText('beefourtees.com · $19', W / 2, H - 198);
+    ctx.fillText('beefourtees.shop · $19', W / 2, H - 198);
     ctx.restore();
   }
 

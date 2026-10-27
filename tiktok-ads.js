@@ -24,7 +24,7 @@ if (fs.existsSync(ENV_PATH)) {
 }
 
 const API_BASE = 'https://business-api.tiktok.com/open_api/v1.3';
-const SITE_URL = process.env.PUBLIC_SITE_URL || 'https://beefourtees.com';
+const SITE_URL = process.env.PUBLIC_SITE_URL || 'https://beefourtees.shop';
 
 function getCreds() {
   return {
