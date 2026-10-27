@@ -631,6 +631,119 @@ async function init() {
       closeSetupModal();
     }
   });
+
+  startSalesTicker();
+}
+
+const TICKER_BUYER_NAMES = [
+  'Janet', 'Marcus', 'Chloe', 'Devon', 'Brenda', 'Tyler', 'Sloane', 'Gabe', 'Nadia', 'Trevor',
+  'Kelsey', 'keith_99', 'Simone', 'Derek', 'Phoebe', 'Liam', 'Tanya', 'Julian', 'Meredith', 'Connor',
+  'Bianca', 'Seth', 'Valerie', 'Owen', 'Yuki', 'Caleb', 'Hannah', 'Wanda', 'Mitch', 'Elena',
+  'Zack', 'Renee', 'Gord', 'Priya', 'Craig', 'Noelle', 'Gavin', 'heather', 'Dante', 'Kendra',
+  'Stu', 'Mallory', 'Felix', 'Audrey', 'Bryce', 'Carmen', 'Nolan', 'Trish', 'Wyatt', 'Sabrina',
+  'Darryl', 'Zoe', 'Keegan', 'Patty', 'Reid', 'Tessa', 'Colin', 'Marlene', 'Jordy', 'Fiona',
+  'Shane', 'Gretchen', 'Miles', 'Denise', 'Aiden', 'Lori', 'Soren', 'Raquel', 'Bev', 'Lucas',
+  'Maureen', 'Toby', 'Astrid', 'Barb', 'Cyrus', 'Jade', 'Norm', 'Kyla', 'Vince', 'Gemma',
+  'Giselle', 'Blake', 'Cheryl', 'Rory', 'Deirdre', 'Cole', 'Tammy', 'Ezra', 'Nina', 'Burt',
+  'Sasha', 'Wayne', 'maya', 'Kurt', 'Gail', 'Hector', 'Paige', 'Arlo', 'Cindy', 'Tarek',
+  'Pam', 'Declan', 'Rhonda', 'Leo', 'Sylvia'
+];
+
+const TICKER_COLOR_LABELS = [
+  { label: 'hot pink', colorIndex: 1 },
+  { label: 'neon yellow', colorIndex: 0 },
+  { label: 'neon orange', colorIndex: 2 },
+  { label: 'neon green', colorIndex: 3 },
+  { label: 'electric cyan', colorIndex: 4 },
+  { label: 'ultraviolet', colorIndex: 5 },
+  { label: 'neon pink', colorIndex: 1 }
+];
+
+function buildSalesTickerEntries() {
+  const entries = [
+    {
+      buyer: 'Janet',
+      phrase: 'doodle xray',
+      colorLabel: 'hot pink',
+      colorIndex: 1
+    }
+  ];
+
+  for (let i = 1; i < 105; i++) {
+    const buyer = TICKER_BUYER_NAMES[i % TICKER_BUYER_NAMES.length];
+    const phraseObj = state.phrases[(i * 11 + 3) % state.phrases.length];
+    const colorChoice = TICKER_COLOR_LABELS[(i * 3) % TICKER_COLOR_LABELS.length];
+    entries.push({
+      buyer,
+      phrase: phraseObj.text,
+      colorLabel: colorChoice.label,
+      colorIndex: colorChoice.colorIndex
+    });
+  }
+  return entries;
+}
+
+function startSalesTicker() {
+  const toastEl = document.getElementById('salesTickerToast');
+  const bodyBtn = document.getElementById('salesTickerBody');
+  const textEl = document.getElementById('salesTickerText');
+  const closeBtn = document.getElementById('salesTickerClose');
+  if (!toastEl || !bodyBtn || !textEl || !closeBtn) return;
+
+  const entries = buildSalesTickerEntries();
+  let currentEntry = entries[0];
+  let dismissed = false;
+  let hideTimer = null;
+  let nextTimer = null;
+  let step = 0;
+
+  function showToast(entry) {
+    if (dismissed) return;
+    currentEntry = entry;
+    const colorObj = state.colors[entry.colorIndex] || state.colors[0];
+    toastEl.style.setProperty('--ticker-neon', colorObj.hex);
+    textEl.innerHTML = `${entry.buyer} just bought <span class="sales-ticker-phrase">${entry.phrase}</span> in ${entry.colorLabel}`;
+    toastEl.hidden = false;
+    requestAnimationFrame(() => {
+      toastEl.classList.add('visible');
+    });
+
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      toastEl.classList.remove('visible');
+      nextTimer = setTimeout(scheduleNext, 3400 + Math.floor(Math.random() * 2800));
+    }, 4800);
+  }
+
+  function scheduleNext() {
+    if (dismissed) return;
+    // First popup is always "Janet just bought doodle xray in hot pink", then random across all 105
+    const entry = step === 0
+      ? entries[0]
+      : entries[1 + Math.floor(Math.random() * (entries.length - 1))];
+    step++;
+    showToast(entry);
+  }
+
+  bodyBtn.addEventListener('click', () => {
+    const pIdx = state.phrases.findIndex(p => p.text === currentEntry.phrase);
+    if (pIdx !== -1) state.selectedPhraseIndex = pIdx;
+    state.selectedColorIndex = currentEntry.colorIndex;
+    renderShirtAndTicket();
+  });
+
+  closeBtn.addEventListener('click', () => {
+    dismissed = true;
+    clearTimeout(hideTimer);
+    clearTimeout(nextTimer);
+    toastEl.classList.remove('visible');
+    setTimeout(() => {
+      toastEl.hidden = true;
+    }, 280);
+  });
+
+  // Pop up first notification 2.2s after page load
+  nextTimer = setTimeout(scheduleNext, 2200);
 }
 
 init();
