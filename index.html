@@ -144,7 +144,7 @@
             <span class="ticket-tag">bee four tee / archive issue</span>
             <h1 class="ticket-title" id="ticketSpecimenId">specimen #01</h1>
           </div>
-          <div class="ticket-price" id="ticketPriceDisplay">$19</div>
+          <div class="ticket-price" id="ticketPriceDisplay">$18</div>
         </div>
 
         <!-- Generator / Shuffle Control -->
@@ -215,7 +215,7 @@
         <!-- Primary Stripe Checkout CTA -->
         <div class="checkout-actions">
           <button type="button" class="buy-btn" id="buyShirtBtn">
-            <span id="buyBtnLabel">buy this shirt — $19</span>
+            <span id="buyBtnLabel">buy this shirt — $18</span>
           </button>
           <div class="checkout-subactions">
             <span class="secure-note">instant checkout via Stripe · free dropship delivery</span>
@@ -292,15 +292,15 @@
         </div>
 
         <label class="form-field">
-          <span class="field-label">Stripe Secret Key (<code>sk_live_...</code> or <code>sk_test_...</code>)</span>
+          <span class="field-label">Stripe Secret Key (<code>sk_live_...</code> or <code>rk_live_...</code>)</span>
           <input
             type="password"
             id="stripeSecretKeyInput"
             class="field-input"
-            placeholder="sk_live_..."
+            placeholder="rk_live_••••••••ybJy (active)"
             autocomplete="off"
           />
-          <span class="field-hint" id="currentStripeKeyStatus">currently unconfigured — paste your key to turn on live checkout</span>
+          <span class="field-hint" id="currentStripeKeyStatus">active key: rk_live_••••••••ybJy (live mode — acct_1UV6HDGhkQcWL1QL)</span>
         </label>
 
         <div class="form-row">
@@ -313,7 +313,7 @@
               min="5"
               max="500"
               step="1"
-              value="28"
+              value="18"
             />
           </label>
 

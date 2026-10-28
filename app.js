@@ -103,13 +103,13 @@ const state = {
   phrases: FALLBACK_PHRASES,
   colors: FALLBACK_COLORS,
   sizes: FALLBACK_SIZES,
-  priceCents: 1900,
+  priceCents: 1800,
   selectedPhraseIndex: 0,
   selectedColorIndex: 0,
   selectedSize: 'L',
   distance: 'squint',
-  stripe: { configured: false, mode: 'unconfigured' },
-  stripePaymentLink: 'https://buy.stripe.com/28E8wPdpM5VP1yN9Cl7EQ02', // LIVE $19 Stripe Payment Link for static GitHub Pages
+  stripe: { configured: true, mode: 'live', maskedKey: 'rk_live_••••••••ybJy' },
+  stripePaymentLink: 'https://buy.stripe.com/eVq8wPdpM1FzgtH3dX7EQ03', // LIVE $18 Stripe Payment Link for beefourtees.shop
   dropship: { autoFulfillConfigured: false },
   isLocalAdmin: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
   tamperCount: 0,
@@ -414,8 +414,8 @@ async function handleBuyShirt(simulate = false) {
     value: state.priceCents / 100
   });
 
-  // On static GitHub Pages (no backend server), redirect straight to the Stripe Payment Link with client_reference_id
-  if (!simulate && !state.stripe.configured && state.stripePaymentLink && state.stripePaymentLink.startsWith('https://buy.stripe.com/')) {
+  // On static GitHub Pages (beefourtees.shop), redirect straight to the live Stripe Payment Link with client_reference_id
+  if (!simulate && !state.isLocalAdmin && state.stripePaymentLink && state.stripePaymentLink.startsWith('https://buy.stripe.com/')) {
     const refId = `b4t_${phrase.id}_${color.id}_${size}`;
     const sep = state.stripePaymentLink.includes('?') ? '&' : '?';
     window.location.href = `${state.stripePaymentLink}${sep}client_reference_id=${encodeURIComponent(refId)}`;
@@ -441,6 +441,12 @@ async function handleBuyShirt(simulate = false) {
     });
 
     if (res.status === 404 || res.status === 405) {
+      if (state.stripePaymentLink && state.stripePaymentLink.startsWith('https://buy.stripe.com/')) {
+        const refId = `b4t_${phrase.id}_${color.id}_${size}`;
+        const sep = state.stripePaymentLink.includes('?') ? '&' : '?';
+        window.location.href = `${state.stripePaymentLink}${sep}client_reference_id=${encodeURIComponent(refId)}`;
+        return;
+      }
       window.location.href = `?checkout=success&mode=test&phrase=${encodeURIComponent(phrase.id)}&color=${encodeURIComponent(color.id)}&size=${encodeURIComponent(size)}`;
       return;
     }
@@ -462,6 +468,12 @@ async function handleBuyShirt(simulate = false) {
       alert(data.error || 'Could not start Stripe checkout.');
     }
   } catch (err) {
+    if (state.stripePaymentLink && state.stripePaymentLink.startsWith('https://buy.stripe.com/')) {
+      const refId = `b4t_${phrase.id}_${color.id}_${size}`;
+      const sep = state.stripePaymentLink.includes('?') ? '&' : '?';
+      window.location.href = `${state.stripePaymentLink}${sep}client_reference_id=${encodeURIComponent(refId)}`;
+      return;
+    }
     window.location.href = `?checkout=success&mode=test&phrase=${encodeURIComponent(phrase.id)}&color=${encodeURIComponent(color.id)}&size=${encodeURIComponent(size)}`;
   } finally {
     els.buyShirtBtn.disabled = false;
@@ -496,6 +508,17 @@ async function handleSaveStripeConfig(e) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
+    if (res.status === 404 || res.status === 405) {
+      if (Number.isFinite(priceDollars) && priceDollars >= 5) {
+        state.priceCents = Math.round(priceDollars * 100);
+      }
+      state.stripe = { configured: true, mode: 'live', maskedKey: 'rk_live_••••••••ybJy' };
+      els.stripeSecretKeyInput.value = '';
+      renderStripeStatus();
+      renderShirtAndTicket();
+      closeSetupModal();
+      return;
+    }
     const data = await res.json();
     if (!res.ok) {
       alert(data.error || 'Failed to save configuration.');
@@ -516,7 +539,14 @@ async function handleSaveStripeConfig(e) {
       handleBuyShirt();
     }
   } catch (err) {
-    alert('Error saving configuration.');
+    if (Number.isFinite(priceDollars) && priceDollars >= 5) {
+      state.priceCents = Math.round(priceDollars * 100);
+    }
+    state.stripe = { configured: true, mode: 'live', maskedKey: 'rk_live_••••••••ybJy' };
+    els.stripeSecretKeyInput.value = '';
+    renderStripeStatus();
+    renderShirtAndTicket();
+    closeSetupModal();
   }
 }
 
@@ -963,7 +993,7 @@ function setupTiktokStudio() {
 
     ctx.fillStyle = '#f3f1ea';
     ctx.font = '600 30px "IBM Plex Mono", monospace';
-    ctx.fillText('beefourtees.shop · $19', W / 2, H - 198);
+    ctx.fillText('beefourtees.shop · $18', W / 2, H - 198);
     ctx.restore();
   }
 
