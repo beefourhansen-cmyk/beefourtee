@@ -131,6 +131,48 @@ input {
   color: var(--text-light);
 }
 
+.sister-shop-link {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--active-neon);
+  text-decoration: none;
+  border: 1px solid var(--studio-border);
+  background: #10100e;
+  padding: 0.34rem 0.68rem;
+  border-radius: 3px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.sister-shop-link:hover {
+  border-color: var(--active-neon);
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.footer-sister-link {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-light);
+  text-decoration: none;
+  border: 1px solid var(--studio-border);
+  padding: 0.35rem 0.75rem;
+  border-radius: 3px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.footer-sister-link strong {
+  color: var(--active-neon);
+}
+
+.footer-sister-link:hover {
+  border-color: var(--active-neon);
+}
+
 .stripe-status-btn {
   display: inline-flex;
   align-items: center;
